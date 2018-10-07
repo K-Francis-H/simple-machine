@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+   <head>
+      <script src="Machine.js"></script>
+      <script src="Assembler.js"></script>
+      <script>
+         //just a little something to see what it all looks like
+         window.addEventListener("load", function(){
+		     var regCan = document.getElementById("register");
+		     var rctx = regCan.getContext("2d");
+		     rctx.fillStyle = "#F00";
+		     rctx.fillRect(0,0,10,160);
+		     var memCan = document.getElementById("memory");
+		     var mctx = memCan.getContext("2d");
+		     mctx.fillStyle = "#00F";
+		     mctx.fillRect(0,0,256,256); 
+           var textarea = document.getElementById("program-input");
+           textarea.value = textarea.value === "" ? "SET 0 0xff;\n\n"+
+                                   "STO 1 1;\n"+
+                                   "STO 0 132;\n"+
+                                   "STO 0 116;\n"+
+                                   "STO 0 100;\n"+
+                                   "STO 0 117;\n"+
+                                   "STO 0 134;\n"+
+                                   "STO 0 118;\n"+
+                                   "STO 0 102;\n\n"+
+                                   //"STO 0 136;\n"+
+                                   //"STO 0 104;\n"+
+                                   "STO 0 137;\n"+
+                                   "STO 0 121;\n"+
+                                   "STO 0 105;\n\n"+
+                                   //"STO 0 138;\n"+
+                                   //"STO 0 106;\n"+
+                                   "HLT;" 
+                                   :
+                                   textarea.value;
+
+
+           var machine = new Machine();
+           var assembleMode = true;
+           var storedAssemblyCode = "";
+           document.getElementById("assemble-button").onclick = function(){
+               var textarea = document.getElementById("program-input");
+               if(assembleMode){
+                  storedAssemblyCode = textarea.value;
+
+                  var asm = new Assembler(textarea.value);
+                  var machineCode = asm.assemble();
+
+                  console.log(machineCode);
+
+                  
+                  textarea.value = "";
+                  for(var i=0; i < machineCode.length; i++){
+                     if(machineCode[i] < 0x1f )//pad the bit pattern  if it can be represented by just 1 hex digit
+                        textarea.value += "0";
+                     textarea.value += ""+machineCode[i].toString(16);
+                  }
+
+                  assembleMode = false;
+                  document.getElementById("assemble-button").innerHTML = "Disassemble";
+               }
+               else{
+                  textarea.value = storedAssemblyCode;
+                  assembleMode = true;
+                  document.getElementById("assemble-button").innerHTML = "Assemble";
+               }
+           };
+           document.getElementById("load-button").onclick=function(){
+               console.log("raw program: "+document.getElementById("program-input").value);
+
+               //asembler test
+               //var asm = new Assembler(document.getElementById("program-input").value);
+               //var machineCode = asm.assemble();
+
+               //console.log(machineCode);
+
+               //machine.loadProgramCode(machineCode);
+
+               machine.loadProgramText(document.getElementById("program-input").value);
+           };
+           document.getElementById("run-button").onclick=function(){
+               machine.runProgram();
+           }
+         });
+      </script>
+   </head>
+   <body>
+
+      <center>
+         Program Counter<p id=program-counter>000</p>
+         Instruction Register<p id=instruction-register>0000</p>
+         <canvas height=160 width=10 id="register"></canvas>
+         <canvas height=160 width=160 id="memory"></canvas>
+	      <br>
+	      <br>
+	      <textarea id="program-input" cols="40" rows="20"> </textarea>
+         <br>
+         <button id="assemble-button">Assemble Program</button>
+         <button id="load-button">Load Program</button>
+         <button id="run-button">Run Program</button>
+         <table>
+            <tr>
+               <td>Instruction</td>
+               <td>Description</td>
+               <td>Hex Value</td>
+            </tr>
+            <tr>
+               <td>LOD R XY</td>
+               <td>Load register R with the contents of memory cell XY</td>
+               <td>0x1</td>
+            </tr>
+            <tr>
+               <td>SET R XY</td>
+               <td>Set the contents of register R equal to bit pattern XY</td>
+               <td>0x2</td>
+            </tr>
+            <tr>
+               <td>STO R XY</td>
+               <td>Store bit pattern in register R to memory cell XY</td>
+               <td>0x3</td>
+            </tr>
+            <tr>
+               <td>MOV D R S</td>
+               <td>Move (copy) contents of register R to register S, D is ignored</td>
+               <td>0x4</td>
+            </tr>
+            <tr>
+               <td>ADI R S T</td>
+               <td>Add values in register S and T as 2's complement then store result in register R</td>
+               <td>0x5</td>
+            </tr>
+            <tr>
+               <td>ADF R S T</td>
+               <td>Add values in registers S and T as floating point* then store result in register R</td>
+               <td>0x6</td>
+            </tr>
+            <tr>
+               <td>OR R S T</td>
+               <td>Bitwise or values in registers S and T then store result in regster R</td>
+               <td>0x7</td>
+            </tr>
+            <tr>
+               <td>AND R S T</td>
+               <td>Bitwise and values in registers S and T then store result in register R</td>
+               <td>0x8</td>
+            </tr>
+            <tr>
+               <td>XOR R S T</td>
+               <td>Bitwise xor values in register S and T then store result in register R</td>
+               <td>0x9</td>
+            </tr>
+            <tr>
+               <td>ROT R D X</td>
+               <td>Rotate the value in register R to the right X times, D is ignored</td>
+               <td>0xA</td>
+            </tr>
+            <tr>
+               <td>JMP R XY</td>
+               <td>Jump to the instruction in memory cell XY if the bit pattern in register R equals that in register 0</td>
+               <td>0xB</td>
+            </tr>
+            <tr>
+               <td>HLT</td>
+               <td>Halt program execution</td>
+               <td>0xC</td>
+            </tr>
+         </table>
+      </center>
+   </body>
+</html>
