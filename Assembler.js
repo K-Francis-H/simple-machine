@@ -31,6 +31,9 @@ function Assembler(assemblyCode){
 
 		var lines = assemblyCode.replace(/\n|\r/g, "")
 		                        .split(specialChars.LINE_END);
+
+		console.log(lines);		
+
 		for(var i=0; i < lines.length; i++){
 			console.log(lines[i]);
 			var tokens = lines[i].split(specialChars.WHITE_SPACE);

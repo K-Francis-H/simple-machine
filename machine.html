@@ -14,7 +14,7 @@
 		     mctx.fillStyle = "#00F";
 		     mctx.fillRect(0,0,256,256); 
            var textarea = document.getElementById("program-input");
-           textarea.value = textarea.value === "" ? "SET 0 0xff;\n\n"+
+           textarea.value =        "SET 0 0xff;\n\n"+
                                    "STO 1 1;\n"+
                                    "STO 0 132;\n"+
                                    "STO 0 116;\n"+
@@ -30,9 +30,7 @@
                                    "STO 0 105;\n\n"+
                                    //"STO 0 138;\n"+
                                    //"STO 0 106;\n"+
-                                   "HLT;" 
-                                   :
-                                   textarea.value;
+                                   "HLT;";
 
 
            var machine = new Machine();
