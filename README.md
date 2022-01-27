@@ -1,6 +1,8 @@
 # simple-machine
 A really simple machine simulator, with assembly language, compiler and execution viewer
 
+https://k-francis-h.github.io/simple-machine/
+
 Instruction 	Description 	Hex Value
 
 LOD R XY 	Load register R with the contents of memory cell XY 	0x1
